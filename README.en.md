@@ -577,4 +577,4 @@ After the upgrade, hit `/api/runs?limit=1&offset=0` again. If the issue persists
 
 ---
 
-© 2025 Suzhou Yunrong Information Technology Co., Ltd. All rights reserved.
+Suzhou Yunrong Information Technology Co., Ltd. is sponsoring this project.
