@@ -1,8 +1,8 @@
-# Dify-KB-Eval
+# KB-Eval
 
 Language: [简体中文](README.md) | English
 
-Dify-KB-Eval is a standalone retrieval quality evaluation platform for Dify knowledge bases. It brings dataset management, Dify Knowledge Base API calls, retrieval metric calculation, failure analysis, and cross-run comparison into a single tool — useful for engineering, QA, and delivery-time validation of knowledge-base recall.
+KB-Eval is a standalone retrieval quality evaluation platform for Dify knowledge bases. It brings dataset management, Dify Knowledge Base API calls, retrieval metric calculation, failure analysis, and cross-run comparison into a single tool — useful for engineering, QA, and delivery-time validation of knowledge-base recall.
 
 Run metadata is stored in the project's bundled PostgreSQL database. Evaluation datasets, retrieval details, and downloaded artifacts are kept in local project directories. To run an evaluation you only need a Dify API base URL, a Dify API Key, and a target knowledge base.
 
