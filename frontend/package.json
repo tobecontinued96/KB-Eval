@@ -1,0 +1,29 @@
+{
+  "name": "dify-kb-eval-frontend",
+  "version": "1.0.6",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "lint": "tsc -b --pretty false",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test:helpers": "tsc src/pages/datasetEditorHelpers.ts src/pages/datasetGenerateHelpers.ts src/pages/homeDifyCredentials.ts src/pages/homeInsights.ts src/pages/runCompareScoring.ts src/pages/runHistoryHelpers.ts src/widgets/DeleteDatasetDialog.tsx src/widgets/DeleteSuccessToast.tsx --target ES2022 --module ES2022 --moduleResolution Bundler --jsx react-jsx --outDir .tmp/test-build --skipLibCheck --strict --esModuleInterop --allowSyntheticDefaultImports && node src/pages/datasetEditorHelpers.test.mjs && node src/pages/datasetGenerateHelpers.test.mjs && node src/pages/homeDifyCredentials.test.mjs && node src/pages/homeInsights.test.mjs && node src/pages/runCompareScoring.test.mjs && node src/pages/runHistoryHelpers.test.mjs && node src/widgets/DeleteDatasetDialog.test.mjs && node src/widgets/DeleteSuccessToast.test.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "lucide-react": "^1.0.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-markdown": "^9.1.0",
+    "react-router-dom": "^7.14.2",
+    "remark-gfm": "^4.0.1",
+    "vite": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~5.9.3"
+  }
+}

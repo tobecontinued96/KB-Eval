@@ -1,0 +1,36 @@
+reports/*
+!reports/.gitkeep
+datasets/generated/*
+!datasets/generated/.gitkeep
+generated_sources/*
+!generated_sources/.gitkeep
+config/*.local.json
+frontend/node_modules/
+frontend/dist/
+frontend/.tmp/
+frontend/*.log
+__pycache__/
+.venv/
+.pytest_cache/
+*.pyc
+.env
+logs/
+offline-packages/
+
+# 个人工作小结(本地起草用,不入仓;**/*.md 全树生效,docs/ 下的也要忽略)
+今日工作-*.md
+今日工作总结-*.md
+**/今日工作-*.md
+**/今日工作总结-*.md
+# auto-branch-work state
+.auto-branch-work/
+
+# runtime logs (local only)
+logs/
+
+# 
+node_modules/
+node_modules/*
+
+
+frontend/package.json

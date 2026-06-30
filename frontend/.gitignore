@@ -1,0 +1,3 @@
+# Local env overrides — keep secrets and per-machine settings out of git
+.env.local
+.env.*.local

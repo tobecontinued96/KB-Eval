@@ -1,0 +1,109 @@
+services:
+  db:
+    image: ${POSTGRES_IMAGE:-m.daocloud.io/docker.io/library/postgres:16}
+    pull_policy: never
+    container_name: dify-kb-eval-db
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      POSTGRES_DB: ${POSTGRES_DB:-aine2_kb_eval}
+      POSTGRES_USER: ${POSTGRES_USER:-aine2}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aine2}
+    command: ["postgres", "-c", "timezone=${TZ:-Asia/Shanghai}"]
+    ports:
+      - "5555:5432"
+    volumes:
+      - aine2-pg-data:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      dify-kb-eval-net:
+        aliases:
+          - db
+          - dify-kb-eval-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aine2} -d ${POSTGRES_DB:-aine2_kb_eval}"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  backend:
+    image: ${BACKEND_IMAGE:-dify-kb-eval-backend:offline}
+    pull_policy: never
+    container_name: dify-kb-eval-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-aine2_kb_eval}
+      POSTGRES_USER: ${POSTGRES_USER:-aine2}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aine2}
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-}
+      RUN_DB_BOOTSTRAP: ${RUN_DB_BOOTSTRAP:-true}
+      RUN_DB_MIGRATIONS: ${RUN_DB_MIGRATIONS:-false}
+      RUN_DB_INIT_ON_EMPTY: ${RUN_DB_INIT_ON_EMPTY:-true}
+      RUN_DB_STAMP_HEAD_ON_INIT: ${RUN_DB_STAMP_HEAD_ON_INIT:-true}
+      DB_WAIT_TIMEOUT_SECONDS: ${DB_WAIT_TIMEOUT_SECONDS:-60}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_DIR: ${LOG_DIR:-logs}
+      LOG_TO_FILE: ${LOG_TO_FILE:-true}
+      EVAL_RUNNER_CONCURRENCY: ${EVAL_RUNNER_CONCURRENCY:-8}
+      EVAL_RUNNER_TICK_MS: ${EVAL_RUNNER_TICK_MS:-500}
+      EVAL_RUNNER_SUBPROCESS: ${EVAL_RUNNER_SUBPROCESS:-enabled}
+      MINERU_API_TOKEN: ${MINERU_API_TOKEN:-}
+      MARKITDOWN_COMMAND: ${MARKITDOWN_COMMAND:-}
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - "${BACKEND_PORT:-8200}:8200"
+    volumes:
+      - ./datasets:/app/datasets
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+      - ./generated_sources:/app/generated_sources
+      - ./config:/app/config
+      - ./docs:/docs:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      dify-kb-eval-net:
+        aliases:
+          - backend
+          - dify-kb-eval-backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8200/api/health', timeout=2).read()"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-dify-kb-eval-frontend:offline}
+    pull_policy: never
+    container_name: dify-kb-eval-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - "${FRONTEND_PORT:-5598}:80"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      dify-kb-eval-net:
+        aliases:
+          - frontend
+          - dify-kb-eval-frontend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  aine2-pg-data:
+
+networks:
+  dify-kb-eval-net:
+    name: ${DOCKER_NETWORK_NAME:-dify-kb-eval-net}
+    driver: bridge

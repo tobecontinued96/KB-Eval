@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>目标知识库下拉内搜索原型</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #f6f8fc;
+        color: #1e2e44;
+        font-family: "Microsoft YaHei UI", "PingFang SC", "Segoe UI", Arial, sans-serif;
+        letter-spacing: 0;
+      }
+
+      .prototype {
+        width: 920px;
+        padding: 24px 30px 30px;
+        border: 1px solid #d9e2ef;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 14px 34px rgba(30, 41, 59, 0.08);
+      }
+
+      .title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+
+      .title strong {
+        font-size: 18px;
+      }
+
+      .title span {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .field {
+        position: relative;
+        display: grid;
+        gap: 7px;
+        min-width: 0;
+      }
+
+      .field-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .field-label {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .select {
+        width: 100%;
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border: 1px solid #d9e2ef;
+        border-radius: 8px;
+        padding: 0 12px;
+        background: #fff;
+        color: #1e2e44;
+        font-size: 14px;
+      }
+
+      .select.open {
+        border-color: #5b8def;
+        box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.14);
+      }
+
+      .select strong {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 30px;
+        border: 1px solid #d9e2ef;
+        border-radius: 7px;
+        padding: 0 9px;
+        background: #f8fafc;
+        color: #475569;
+        font-size: 11.5px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 22px;
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .meta strong {
+        color: #1e2e44;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 22px;
+        border: 1px solid #d9e2ef;
+        border-radius: 999px;
+        padding: 0 8px;
+        background: #f8fafc;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .pill.green {
+        border-color: #b7edc7;
+        background: #eafaf0;
+        color: #166534;
+      }
+
+      .pill.blue {
+        border-color: #cfe0ff;
+        background: #eef5ff;
+        color: #1d4ed8;
+      }
+
+      .dropdown {
+        width: 100%;
+        margin-top: 1px;
+        border: 1px solid #c8d6ea;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 16px 34px rgba(30, 41, 59, 0.14);
+        overflow: hidden;
+      }
+
+      .dropdown-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 42px;
+        margin: 10px;
+        border: 1px solid #b9cff8;
+        border-radius: 7px;
+        padding: 0 10px;
+        background: #fbfdff;
+      }
+
+      .dropdown-search strong {
+        font-size: 14px;
+      }
+
+      .dropdown-search span {
+        color: #94a3b8;
+        font-size: 12px;
+      }
+
+      .dropdown-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 0 10px 8px;
+        color: #64748b;
+        font-size: 12px;
+      }
+
+      .option-list {
+        display: grid;
+        gap: 0;
+        border-top: 1px solid #edf2f7;
+      }
+
+      .option {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        min-height: 54px;
+        padding: 9px 12px;
+        border-bottom: 1px solid #edf2f7;
+      }
+
+      .option:last-child {
+        border-bottom: 0;
+      }
+
+      .option.active {
+        background: #f5f9ff;
+        box-shadow: inset 3px 0 0 #2563eb;
+      }
+
+      .option-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-width: 0;
+      }
+
+      .option-title strong {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 13px;
+      }
+
+      .option-tags {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 5px;
+      }
+
+      .option-id {
+        min-width: 0;
+        overflow: hidden;
+        color: #94a3b8;
+        font-size: 11px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .score {
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .icon {
+        width: 15px;
+        height: 15px;
+        flex: 0 0 auto;
+        color: #64748b;
+      }
+
+      .check {
+        color: #2563eb;
+      }
+
+      .divider {
+        width: 1px;
+        height: 12px;
+        background: #d9e2ef;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="prototype" aria-label="目标知识库下拉内搜索原型">
+      <div class="title">
+        <strong>运行配置</strong>
+        <span>搜索放在目标知识库下拉面板内</span>
+      </div>
+
+      <section class="form-row">
+        <label class="field">
+          <span class="field-head">
+            <span class="field-label">评测集</span>
+          </span>
+          <span class="select">
+            <strong>华为 S1720-200 知识库评测集 · 已审核</strong>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </span>
+          <span class="meta">
+            <span class="pill green">已审核 · 2026-06-22 13:13</span>
+          </span>
+        </label>
+
+        <div class="field">
+          <span class="field-head">
+            <span class="field-label">目标知识库</span>
+          </span>
+
+          <span class="select open">
+            <strong>Huawei S1720 知识库 (BGE + Cohere Rerank)</strong>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </span>
+
+          <div class="dropdown">
+            <div class="dropdown-search">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <strong>S1720</strong>
+              <span>搜索名称 / 厂商 / 型号 / 编号</span>
+            </div>
+            <div class="dropdown-meta">
+              <span><strong>3 个匹配</strong> · 共 18 个知识库</span>
+              <span>最后更新 13:18</span>
+            </div>
+            <div class="option-list">
+              <div class="option active">
+                <div>
+                  <div class="option-title">
+                    <svg class="icon check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                    <strong>Huawei S1720 知识库 (BGE + Cohere Rerank)</strong>
+                    <span class="pill blue">推荐</span>
+                  </div>
+                  <div class="option-tags">
+                    <span class="pill">华为</span>
+                    <span class="pill">S1720</span>
+                    <span class="pill">BGE</span>
+                    <span class="pill">Cohere</span>
+                  </div>
+                </div>
+                <span class="score">98%</span>
+              </div>
+
+              <div class="option">
+                <div>
+                  <div class="option-title">
+                    <strong>Huawei S1720 知识库 (BGE-Embedding + BGE-Rerank)</strong>
+                  </div>
+                  <div class="option-id">kb-huawei-s1720-embed-bge</div>
+                </div>
+                <span class="score">94%</span>
+              </div>
+
+              <div class="option">
+                <div>
+                  <div class="option-title">
+                    <strong>Huawei S1720 知识库 (M3E-Embedding + 不重排)</strong>
+                  </div>
+                  <div class="option-id">kb-huawei-s1720-embed-m3e</div>
+                </div>
+                <span class="score">89%</span>
+              </div>
+            </div>
+          </div>
+
+          <span class="meta">
+            <span>选中后自动回填 Embedding / Rerank</span>
+            <span class="divider"></span>
+            <span>支持键盘 ↑↓ + Enter</span>
+          </span>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
