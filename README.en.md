@@ -34,19 +34,7 @@ Use it to answer questions like:
 
 ![Dify-KB-Eval architecture diagram](img/下载.png)
 
-```mermaid
-flowchart LR
-    User["Engineering / QA / Delivery"] --> Web["React + Vite frontend<br/>:5598"]
-    Web --> API["FastAPI backend<br/>:8200"]
-    API --> DB[("PostgreSQL 16<br/>runs / run_summaries / run_reports")]
-    API --> Dataset["Dataset service<br/>generate / edit / review"]
-    Dataset --> Parser["MarkItDown"]
-    Dataset --> Files["datasets/*.jsonl<br/>datasets/generated/*.jsonl"]
-    API --> Runner["Evaluation runner<br/>kb_eval.runner"]
-    Runner --> Dify["Dify Knowledge Base API"]
-    Runner --> Artifacts["reports/&lt;run_id&gt;/<br/>results / csv / logs"]
-    Artifacts --> Web
-```
+
 
 | Content | Location |
 | --- | --- |
