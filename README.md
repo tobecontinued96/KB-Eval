@@ -76,13 +76,13 @@ Copy-Item .env.example .env
 启动后端、前端和本地数据库：
 
 ```powershell
-.\start.ps1
+.\scripts\windows\start.ps1
 ```
 
 或在 `cmd` 中执行：
 
 ```cmd
-start.bat
+scripts\windows\start.bat
 ```
 
 脚本会检查 `uv` / `npm`，在 Docker 可用时启动 PostgreSQL，安装缺失依赖，并分别启动：
