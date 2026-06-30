@@ -76,13 +76,13 @@ Copy-Item .env.example .env
 Start the backend, frontend, and local database:
 
 ```powershell
-.\start.ps1
+.\scripts\windows\start.ps1
 ```
 
 Or in `cmd`:
 
 ```cmd
-start.bat
+scripts\windows\start.bat
 ```
 
 The script checks for `uv` / `npm`, starts PostgreSQL when Docker is available, installs missing dependencies, and starts each service separately:
@@ -93,26 +93,26 @@ The script checks for `uv` / `npm`, starts PostgreSQL when Docker is available, 
 To preview only the frontend without depending on the backend, database, or Dify, enable mock mode:
 
 ```powershell
-.\start.ps1 -Mock
+.\scripts\windows\start.ps1 -Mock
 ```
 
 Or:
 
 ```cmd
-start.bat -Mock
+scripts\windows\start.bat -Mock
 ```
 
 Linux / macOS:
 
 ```bash
 cp .env.example .env
-bash ./start.sh
+bash ./scripts/linux-mac/start.sh
 ```
 
 `start.sh` runs the backend and frontend together in the foreground by default. Press Ctrl+C to stop both at once. To preview only the frontend without depending on the backend or Dify:
 
 ```bash
-bash ./start.sh --mock
+bash ./scripts/linux-mac/start.sh --mock
 ```
 
 ### Manual start
@@ -167,13 +167,13 @@ Open the Vite local URL in your browser; by default it is `http://127.0.0.1:5598
 If you want to fully deploy the backend, frontend, and PostgreSQL as containers, run this from the project root:
 
 ```powershell
-.\deploy-docker.ps1
+.\scripts\windows\deploy-docker.ps1
 ```
 
 Linux / macOS:
 
 ```bash
-bash ./deploy-docker.sh
+bash ./scripts/linux-mac/deploy-docker.sh
 ```
 
 The deploy script automatically builds the backend / frontend images, starts the `db` / `backend` / `frontend` services, and opens the browser once `http://127.0.0.1:5598/api/health` becomes reachable.
@@ -196,7 +196,7 @@ To switch mirrors, copy `.env.example` to `.env` and override `POSTGRES_IMAGE`, 
 Stop the containers:
 
 ```powershell
-.\deploy-docker.ps1 -Down
+.\scripts\windows\deploy-docker.ps1 -Down
 ```
 
 ### Offline deployment package
@@ -207,7 +207,7 @@ Windows build machine:
 
 ```powershell
 cd C:\Users\17651\Desktop\AI2\Dify-KB-Eval
-.\build-offline-package.ps1
+.\scripts\windows\build-offline-package.ps1
 ```
 
 After the build completes, the offline package is written to:
@@ -225,13 +225,13 @@ dify-kb-eval-offline-20260625-153000.zip
 To specify a delivery version:
 
 ```powershell
-.\build-offline-package.ps1 -Tag v1.0.0
+.\scripts\windows\build-offline-package.ps1 -Tag v1.0.0
 ```
 
 Linux / macOS build machine:
 
 ```bash
-bash ./build-offline-package.sh
+bash ./scripts/linux-mac/build-offline-package.sh
 ```
 
 The script builds the backend / frontend images, pulls the PostgreSQL image, exports all three images to `offline-packages/dify-kb-eval-offline-<timestamp>/images/*.tar`, and generates the offline package. The package bundles:
@@ -244,6 +244,7 @@ images/
 docker-compose.offline.yml
 .env.offline
 deploy-offline.ps1
+deploy-offline.bat
 deploy-offline.sh
 datasets/
 docs/
@@ -269,7 +270,7 @@ First-start in an offline environment also auto-initializes an empty PostgreSQL 
 To include historical run artifacts and uploaded source files in the package:
 
 ```powershell
-.\build-offline-package.ps1 -Tag v1.0.0 -IncludeRuntimeData
+.\scripts\windows\build-offline-package.ps1 -Tag v1.0.0 -IncludeRuntimeData
 ```
 
 ## Basic Workflow
@@ -483,17 +484,17 @@ Dify-KB-Eval/
 ├── generated_sources/        # Uploaded source files and intermediate Markdown
 ├── kb_eval/                  # Dify client, runner, metrics, reports, parsers
 ├── reports/                  # Run artifacts and delete backups
-├── scripts/                  # Migration and maintenance scripts
+├── scripts/
+│   ├── windows/              # Windows start, verification, and deployment scripts
+│   ├── linux-mac/            # Linux/macOS start, verification, and deployment scripts
+│   ├── migrations/           # Manual migration scripts
+│   ├── clean_test_pollution.py
+│   └── migrate_reports_to_db.py
 ├── tests/                    # Backend and core logic tests
 ├── Dockerfile                # Backend image build
 ├── docker-compose.yml        # PostgreSQL + backend + frontend full container stack
 ├── docker-compose.offline.yml # Offline deployment compose, no build / pull
-├── deploy-docker.*           # Docker one-click deploy / stop scripts
-├── build-offline-package.*   # Build offline deployment package
-├── deploy-offline.*          # Load images and start on an offline machine
-├── pyproject.toml            # Python project dependencies
-├── start.ps1 / start.bat / start.sh   # One-command local start scripts
-└── verify.ps1 / verify.bat / verify.sh # Verification scripts
+└── pyproject.toml            # Python project dependencies
 ```
 
 ## Verification
@@ -501,13 +502,13 @@ Dify-KB-Eval/
 Run the unified verification before submitting or delivering:
 
 ```powershell
-.\verify.ps1
+.\scripts\windows\verify.ps1
 ```
 
 Linux / macOS:
 
 ```bash
-bash ./verify.sh
+bash ./scripts/linux-mac/verify.sh
 ```
 
 The verification script runs, in order:
@@ -521,11 +522,11 @@ The verification script runs, in order:
 Skip the sync when dependencies are already up to date:
 
 ```powershell
-.\verify.ps1 -SkipSync
+.\scripts\windows\verify.ps1 -SkipSync
 ```
 
 ```bash
-bash ./verify.sh --skip-sync
+bash ./scripts/linux-mac/verify.sh --skip-sync
 ```
 
 You can also run the checks individually:

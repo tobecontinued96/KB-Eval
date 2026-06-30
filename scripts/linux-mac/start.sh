@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$ROOT_DIR"
 
 MOCK_MODE=0
@@ -31,7 +32,7 @@ command_exists() {
 }
 
 read_dev_port() {
-  local port="9300"
+  local port="5598"
   local file line value
   for file in "$ROOT_DIR/frontend/.env" "$ROOT_DIR/frontend/.env.local"; do
     [[ -f "$file" ]] || continue

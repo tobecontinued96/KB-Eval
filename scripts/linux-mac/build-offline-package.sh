@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+WINDOWS_SCRIPT_DIR="${ROOT_DIR}/scripts/windows"
 cd "$ROOT_DIR"
 
 TAG="$(date +%Y%m%d-%H%M%S)"
@@ -157,7 +159,12 @@ docker save -o "${IMAGE_DIR}/backend.tar" "$BACKEND_IMAGE"
 docker save -o "${IMAGE_DIR}/frontend.tar" "$FRONTEND_IMAGE"
 docker save -o "${IMAGE_DIR}/postgres.tar" "$POSTGRES_IMAGE"
 
-cp docker-compose.offline.yml deploy-offline.ps1 deploy-offline.sh deploy-offline.bat "$PACKAGE_DIR/"
+cp \
+  docker-compose.offline.yml \
+  "${WINDOWS_SCRIPT_DIR}/deploy-offline.ps1" \
+  "${WINDOWS_SCRIPT_DIR}/deploy-offline.bat" \
+  "${SCRIPT_DIR}/deploy-offline.sh" \
+  "$PACKAGE_DIR/"
 copy_dir_or_create datasets "$PACKAGE_DIR"
 copy_dir_or_create docs "$PACKAGE_DIR"
 copy_dir_or_create config "$PACKAGE_DIR"

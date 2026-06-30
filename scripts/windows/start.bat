@@ -11,7 +11,9 @@ REM ============================================================
 
 setlocal EnableExtensions
 
-cd /d "%~dp0"
+set "SCRIPT_DIR=%~dp0"
+for %%I in ("%SCRIPT_DIR%..\..") do set "ROOT_DIR=%%~fI"
+cd /d "%ROOT_DIR%"
 
 set "FRONTEND_PORT=5598"
 for %%F in ("frontend\.env" "frontend\.env.local") do (
@@ -98,15 +100,15 @@ if "%MOCK_MODE%"=="0" if "%BACKEND_BUSY%"=="0" (
   ) else (
     echo [!] docker not on PATH. Assuming an external Postgres is reachable via DATABASE_URL.
   )
-  start "Dify-KB-Eval Backend" cmd /k "uv sync || exit /b 1 & uv run uvicorn backend.app:app --host 127.0.0.1 --port %BACKEND_PORT%"
+  start "Dify-KB-Eval Backend" /D "%ROOT_DIR%" cmd /k "uv sync || exit /b 1 & uv run uvicorn backend.app:app --host 127.0.0.1 --port %BACKEND_PORT%"
   echo [+] Backend window started.
 )
 
 if "%FRONTEND_BUSY%"=="0" (
   if "%MOCK_MODE%"=="1" (
-    start "Dify-KB-Eval Frontend MOCK" cmd /k "set VITE_USE_MOCK=true&&cd /d frontend&&if not exist node_modules (npm install || exit /b 1) & npm run dev"
+    start "Dify-KB-Eval Frontend MOCK" /D "%ROOT_DIR%" cmd /k "set VITE_USE_MOCK=true&&cd /d frontend&&if not exist node_modules (npm install || exit /b 1) & npm run dev"
   ) else (
-    start "Dify-KB-Eval Frontend" cmd /k "cd /d frontend&&if not exist node_modules (npm install || exit /b 1) & npm run dev"
+    start "Dify-KB-Eval Frontend" /D "%ROOT_DIR%" cmd /k "cd /d frontend&&if not exist node_modules (npm install || exit /b 1) & npm run dev"
   )
   echo [+] Frontend window started.
 )

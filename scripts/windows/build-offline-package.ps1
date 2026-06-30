@@ -3,8 +3,8 @@
   Build Docker images and create an offline deployment package.
 
 .EXAMPLE
-  .\build-offline-package.ps1
-  .\build-offline-package.ps1 -Tag v20260625 -IncludeRuntimeData
+  .\scripts\windows\build-offline-package.ps1
+  .\scripts\windows\build-offline-package.ps1 -Tag v20260625 -IncludeRuntimeData
 #>
 
 [CmdletBinding()]
@@ -22,7 +22,9 @@ param(
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location $ScriptDir
+$RepoRoot = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
+$LinuxScriptDir = Join-Path $RepoRoot "scripts\linux-mac"
+Set-Location $RepoRoot
 
 function Assert-Command {
   param([Parameter(Mandatory)][string]$Name)
@@ -42,7 +44,7 @@ function Read-EnvValue {
     return $processValue
   }
 
-  $envFile = Join-Path $ScriptDir ".env"
+  $envFile = Join-Path $RepoRoot ".env"
   if (Test-Path $envFile) {
     foreach ($line in Get-Content -Encoding UTF8 $envFile) {
       if ($line -match "^\s*$([regex]::Escape($Name))\s*=\s*(.+?)\s*$") {
@@ -71,7 +73,7 @@ function Copy-DirectoryIfExists {
     [Parameter(Mandatory)][string]$Name,
     [Parameter(Mandatory)][string]$DestinationRoot
   )
-  $source = Join-Path $ScriptDir $Name
+  $source = Join-Path $RepoRoot $Name
   $destination = Join-Path $DestinationRoot $Name
   if (Test-Path $source) {
     Copy-Item -LiteralPath $source -Destination $DestinationRoot -Recurse -Force
@@ -135,7 +137,7 @@ if (-not $SkipPull) {
 }
 
 $packageName = "dify-kb-eval-offline-$Tag"
-$outputRootPath = Join-Path $ScriptDir $OutputRoot
+$outputRootPath = Join-Path $RepoRoot $OutputRoot
 $packageDir = Join-Path $outputRootPath $packageName
 $imageDir = Join-Path $packageDir "images"
 
@@ -159,10 +161,10 @@ Invoke-Step "Save Postgres image" {
   docker save -o $postgresTar $PostgresImage
 }
 
-Copy-Item -LiteralPath (Join-Path $ScriptDir "docker-compose.offline.yml") -Destination $packageDir -Force
+Copy-Item -LiteralPath (Join-Path $RepoRoot "docker-compose.offline.yml") -Destination $packageDir -Force
 Copy-Item -LiteralPath (Join-Path $ScriptDir "deploy-offline.ps1") -Destination $packageDir -Force
-Copy-Item -LiteralPath (Join-Path $ScriptDir "deploy-offline.sh") -Destination $packageDir -Force
 Copy-Item -LiteralPath (Join-Path $ScriptDir "deploy-offline.bat") -Destination $packageDir -Force
+Copy-Item -LiteralPath (Join-Path $LinuxScriptDir "deploy-offline.sh") -Destination $packageDir -Force
 
 Copy-DirectoryIfExists "datasets" $packageDir
 Copy-DirectoryIfExists "docs" $packageDir

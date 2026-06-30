@@ -14,7 +14,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location $ScriptDir
+$RepoRoot = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
+Set-Location $RepoRoot
 
 function Invoke-Step {
   param(
@@ -51,7 +52,7 @@ Invoke-Step "Check MarkItDown availability" {
   uv run python -c "from kb_eval.markitdown_converter import markitdown_available; raise SystemExit(0 if markitdown_available() else 1)"
 }
 
-$FrontendDir = Join-Path $ScriptDir "frontend"
+$FrontendDir = Join-Path $RepoRoot "frontend"
 if (-not (Test-Path (Join-Path $FrontendDir "node_modules"))) {
   Invoke-Step "Install frontend dependencies" {
     Push-Location $FrontendDir

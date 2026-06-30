@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$ROOT_DIR"
 
 NO_BUILD=0
@@ -139,7 +140,7 @@ cat <<EOF
 Useful commands:
   docker compose ps
   docker compose logs -f backend frontend
-  ./deploy-docker.sh --down
+  ./scripts/linux-mac/deploy-docker.sh --down
 EOF
 
 if [[ "$LOGS" -eq 1 ]]; then

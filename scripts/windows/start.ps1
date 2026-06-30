@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   一键启动 Dify-KB-Eval 的后端 (uvicorn) + 前端 (vite dev) 服务。
 
@@ -13,8 +13,8 @@
   以前端 VITE_USE_MOCK=true 模式启动，跳过真实后端（仅适合纯前端验收）。
 
 .EXAMPLE
-  .\start.ps1
-  .\start.ps1 -Mock
+  .\scripts\windows\start.ps1
+  .\scripts\windows\start.ps1 -Mock
 #>
 
 [CmdletBinding()]
@@ -24,15 +24,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# 切到脚本所在目录（项目根），保证双击、相对路径都能跑
+# 切到项目根，保证双击、相对路径都能跑
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location $ScriptDir
+$RepoRoot = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
+Set-Location $RepoRoot
 
 # ---- 端口探测（不写死，方便改 .env / .env.local） ----------------------------
 $FrontendPort = 5598
 @(
-  (Join-Path $ScriptDir "frontend\.env"),
-  (Join-Path $ScriptDir "frontend\.env.local")
+  (Join-Path $RepoRoot "frontend\.env"),
+  (Join-Path $RepoRoot "frontend\.env.local")
 ) | ForEach-Object {
   if (Test-Path $_) {
     Get-Content $_ | ForEach-Object {
@@ -95,7 +96,7 @@ function Start-InNewWindow {
 }
 
 # ---- 启动后端 ----------------------------------------------------------------
-$BackendDir = $ScriptDir
+$BackendDir = $RepoRoot
 if (-not $Mock -and -not $BackendBusy) {
   # 启动 Postgres（如果 docker 在 PATH 上）。PG 不可用时给个警告，不阻断后端启动。
   if (Get-Command docker -ErrorAction SilentlyContinue) {
@@ -126,7 +127,7 @@ if (-not $Mock -and -not $BackendBusy) {
 }
 
 # ---- 启动前端 ----------------------------------------------------------------
-$FrontendDir = Join-Path $ScriptDir "frontend"
+$FrontendDir = Join-Path $RepoRoot "frontend"
 $ViteExtras = ""
 if ($Mock) {
   $ViteExtras = "`$env:VITE_USE_MOCK='true';"

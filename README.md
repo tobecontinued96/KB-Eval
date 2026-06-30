@@ -93,26 +93,26 @@ scripts\windows\start.bat
 只想预览前端页面时可以启用 mock，不依赖后端、数据库或 Dify：
 
 ```powershell
-.\start.ps1 -Mock
+.\scripts\windows\start.ps1 -Mock
 ```
 
 或：
 
 ```cmd
-start.bat -Mock
+scripts\windows\start.bat -Mock
 ```
 
 Linux / macOS：
 
 ```bash
 cp .env.example .env
-bash ./start.sh
+bash ./scripts/linux-mac/start.sh
 ```
 
 `start.sh` 默认在前台同时跑后端和前端，按 Ctrl+C 一次性停止两者。只想预览前端、不依赖后端和 Dify 时：
 
 ```bash
-bash ./start.sh --mock
+bash ./scripts/linux-mac/start.sh --mock
 ```
 
 ### 手动启动
@@ -167,13 +167,13 @@ VITE_API_BASE_URL="http://127.0.0.1:8200" npm run dev
 如果希望完整用容器部署后端、前端和 PostgreSQL，在项目根目录执行：
 
 ```powershell
-.\deploy-docker.ps1
+.\scripts\windows\deploy-docker.ps1
 ```
 
 Linux / macOS：
 
 ```bash
-bash ./deploy-docker.sh
+bash ./scripts/linux-mac/deploy-docker.sh
 ```
 
 部署脚本会自动构建后端/前端镜像，启动 `db` / `backend` / `frontend` 三个服务，并等待 `http://127.0.0.1:5598/api/health` 就绪后打开浏览器。
@@ -196,7 +196,7 @@ bash ./deploy-docker.sh
 停止容器：
 
 ```powershell
-.\deploy-docker.ps1 -Down
+.\scripts\windows\deploy-docker.ps1 -Down
 ```
 
 ### 离线部署包
@@ -207,7 +207,7 @@ Windows 构建机：
 
 ```powershell
 cd C:\Users\17651\Desktop\AI2\Dify-KB-Eval
-.\build-offline-package.ps1
+.\scripts\windows\build-offline-package.ps1
 ```
 
 构建完成后，离线包会输出到：
@@ -225,13 +225,13 @@ dify-kb-eval-offline-20260625-153000.zip
 如果要指定交付版本号：
 
 ```powershell
-.\build-offline-package.ps1 -Tag v1.0.0
+.\scripts\windows\build-offline-package.ps1 -Tag v1.0.0
 ```
 
 Linux / macOS 构建机：
 
 ```bash
-bash ./build-offline-package.sh
+bash ./scripts/linux-mac/build-offline-package.sh
 ```
 
 脚本会构建后端/前端镜像，拉取 PostgreSQL 镜像，把三份镜像导出到 `offline-packages/dify-kb-eval-offline-<时间>/images/*.tar`，并生成离线包。包内自带：
@@ -244,6 +244,7 @@ images/
 docker-compose.offline.yml
 .env.offline
 deploy-offline.ps1
+deploy-offline.bat
 deploy-offline.sh
 datasets/
 docs/
@@ -269,7 +270,7 @@ bash ./deploy-offline.sh
 如果需要把历史运行产物、上传源文件等也打进包里：
 
 ```powershell
-.\build-offline-package.ps1 -Tag v1.0.0 -IncludeRuntimeData
+.\scripts\windows\build-offline-package.ps1 -Tag v1.0.0 -IncludeRuntimeData
 ```
 
 ## 基本流程
@@ -483,17 +484,17 @@ Dify-KB-Eval/
 ├── generated_sources/        # 上传源文件和中间 Markdown
 ├── kb_eval/                  # Dify client、评测 runner、指标、报告和解析器
 ├── reports/                  # 运行产物与删除备份
-├── scripts/                  # 迁移和维护脚本
+├── scripts/
+│   ├── windows/              # Windows 启动、验证和部署脚本
+│   ├── linux-mac/            # Linux/macOS 启动、验证和部署脚本
+│   ├── migrations/           # 手动迁移脚本
+│   ├── clean_test_pollution.py
+│   └── migrate_reports_to_db.py
 ├── tests/                    # 后端和核心逻辑测试
 ├── Dockerfile                # 后端镜像构建
 ├── docker-compose.yml        # PostgreSQL + 后端 + 前端完整容器栈
 ├── docker-compose.offline.yml # 离线部署 compose，不含 build / pull
-├── deploy-docker.*           # Docker 一键部署/停止脚本
-├── build-offline-package.*   # 构建离线部署包
-├── deploy-offline.*          # 离线机器加载镜像并启动
-├── pyproject.toml            # Python 项目依赖
-├── start.ps1 / start.bat / start.sh   # 本地一键启动脚本
-└── verify.ps1 / verify.bat / verify.sh # 验证脚本
+└── pyproject.toml            # Python 项目依赖
 ```
 
 ## 验证与冒烟测试
@@ -501,13 +502,13 @@ Dify-KB-Eval/
 提交或交付前建议执行统一验证：
 
 ```powershell
-.\verify.ps1
+.\scripts\windows\verify.ps1
 ```
 
 Linux / macOS：
 
 ```bash
-bash ./verify.sh
+bash ./scripts/linux-mac/verify.sh
 ```
 
 验证脚本会依次执行：
@@ -521,11 +522,11 @@ bash ./verify.sh
 依赖已确认最新时可以跳过同步：
 
 ```powershell
-.\verify.ps1 -SkipSync
+.\scripts\windows\verify.ps1 -SkipSync
 ```
 
 ```bash
-bash ./verify.sh --skip-sync
+bash ./scripts/linux-mac/verify.sh --skip-sync
 ```
 
 也可以分别运行：

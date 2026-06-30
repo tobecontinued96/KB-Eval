@@ -3,9 +3,9 @@
   Build and deploy Dify-KB-Eval with Docker Compose.
 
 .EXAMPLE
-  .\deploy-docker.ps1
-  .\deploy-docker.ps1 -NoBuild
-  .\deploy-docker.ps1 -Down
+  .\scripts\windows\deploy-docker.ps1
+  .\scripts\windows\deploy-docker.ps1 -NoBuild
+  .\scripts\windows\deploy-docker.ps1 -Down
 #>
 
 [CmdletBinding()]
@@ -20,7 +20,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location $ScriptDir
+$RepoRoot = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
+Set-Location $RepoRoot
 
 function Assert-Command {
   param([Parameter(Mandatory)][string]$Name)
@@ -40,7 +41,7 @@ function Read-ComposeValue {
     return $processValue
   }
 
-  $envFile = Join-Path $ScriptDir ".env"
+  $envFile = Join-Path $RepoRoot ".env"
   if (Test-Path $envFile) {
     foreach ($line in Get-Content $envFile) {
       if ($line -match "^\s*$([regex]::Escape($Name))\s*=\s*(.+?)\s*$") {
@@ -61,7 +62,7 @@ if ($Down) {
 }
 
 foreach ($dir in @("datasets", "datasets\generated", "reports", "logs", "generated_sources", "config")) {
-  New-Item -ItemType Directory -Force -Path (Join-Path $ScriptDir $dir) | Out-Null
+  New-Item -ItemType Directory -Force -Path (Join-Path $RepoRoot $dir) | Out-Null
 }
 
 if ($Pull) {
@@ -112,7 +113,7 @@ Write-Host ""
 Write-Host "Useful commands:"
 Write-Host "  docker compose ps"
 Write-Host "  docker compose logs -f backend frontend"
-Write-Host "  .\deploy-docker.ps1 -Down"
+Write-Host "  .\scripts\windows\deploy-docker.ps1 -Down"
 
 if ($Logs) {
   docker compose logs -f backend frontend
